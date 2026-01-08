@@ -1,5 +1,6 @@
 # ============================================================
-# Proyecto: Análisis de series temporales - AirPassengers (R)
+# Proyecto: Análisis de series temporales - nottem (R)
+# Temperaturas mensuales en Nottingham (1920-1939)
 # ============================================================
 
 # 0) Paquetes ----
@@ -7,97 +8,95 @@ if (!require(tseries)) install.packages("tseries", dependencies = TRUE)
 library(tseries)
 
 # 1) Carga del dataset y verificación ----
-data("AirPassengers")
+data("nottem")
 
 cat("Clase del objeto:\n")
-print(class(AirPassengers))             # Debe ser "ts"
+print(class(nottem))                 # Debe ser "ts"
 cat("\nResumen estadístico:\n")
-print(summary(AirPassengers))
+print(summary(nottem))
 cat("\nInicio / Fin / Frecuencia:\n")
-print(start(AirPassengers))
-print(end(AirPassengers))
-print(frequency(AirPassengers))         # 12 (mensual)
+print(start(nottem))
+print(end(nottem))
+print(frequency(nottem))             # 12 (mensual)
 
-# 2) Exploración inicial ----
-# Gráfico de la serie
-plot(AirPassengers,
-     main = "AirPassengers (1949-1960): Pasajeros mensuales",
-     xlab = "Año", ylab = "Nº de pasajeros")
+# Gráfica inicial (serie temporal)
+plot(nottem,
+     main = "Temperaturas Mensuales en Nottingham (1920-1939)",
+     xlab = "Año", ylab = "Temperatura",
+     col = "blue")
 
-# Estadísticas descriptivas básicas
-cat("\nEstadísticas descriptivas básicas:\n")
-cat("Media:", mean(AirPassengers), "\n")
-cat("Desviación estándar:", sd(AirPassengers), "\n")
-cat("Mínimo:", min(AirPassengers), "\n")
-cat("Máximo:", max(AirPassengers), "\n")
-
-# 3) Tendencia y estacionalidad (descomposición) ----
-decomp <- decompose(AirPassengers, type = "multiplicative")
+# 2) Exploración: descomposición (tendencia, estacionalidad, aleatoriedad) ----
+# Serie mensual con estacionalidad anual -> decompose es adecuado
+decomp <- decompose(nottem, type = "additive")
 plot(decomp)
 
-# 4) Estacionariedad: ACF/PACF + Dickey-Fuller ----
+# 3) Estacionariedad: ACF/PACF + Dickey-Fuller ----
 par(mfrow = c(1,2))
-acf(AirPassengers, main = "ACF - Serie original")
-pacf(AirPassengers, main = "PACF - Serie original")
+acf(nottem, main = "ACF - Serie original")
+pacf(nottem, main = "PACF - Serie original")
 par(mfrow = c(1,1))
 
 cat("\nADF test (serie original):\n")
-adf_original <- adf.test(AirPassengers)
+adf_original <- adf.test(nottem)
 print(adf_original)
 
-# Si no es estacionaria, diferenciar una vez
-AirPassengers_diff <- diff(AirPassengers, differences = 1)
+# 4) Transformación si no es estacionaria (diferenciación) ----
+# Diferencia simple (para quitar posible tendencia). Si fuese necesario, el ADF debería mejorar.
+nottem_diff <- diff(nottem, differences = 1)
 
-plot(AirPassengers_diff,
-     main = "Serie diferenciada (1ª diferencia)",
-     xlab = "Año", ylab = "Diferencia mensual (pasajeros)")
+plot(nottem_diff,
+     main = "nottem (1ª diferencia)",
+     xlab = "Año", ylab = "Diferencia de temperatura",
+     col = "blue")
 
 par(mfrow = c(1,2))
-acf(AirPassengers_diff, main = "ACF - 1ª diferencia")
-pacf(AirPassengers_diff, main = "PACF - 1ª diferencia")
+acf(nottem_diff, main = "ACF - 1ª diferencia")
+pacf(nottem_diff, main = "PACF - 1ª diferencia")
 par(mfrow = c(1,1))
 
 cat("\nADF test (1ª diferencia):\n")
-adf_diff <- adf.test(AirPassengers_diff)
+adf_diff <- adf.test(nottem_diff)
 print(adf_diff)
 
 # 5) Detección de valores atípicos ----
-# Boxplot para detectar outliers de forma visual
-boxplot(AirPassengers,
-        main = "Boxplot - AirPassengers (detección visual de outliers)",
-        ylab = "Nº de pasajeros")
+# Boxplot para detección visual
+boxplot(nottem,
+        main = "Boxplot - nottem (detección visual de outliers)",
+        ylab = "Temperatura")
 
-# Detección simple con IQR (sobre valores de la serie)
-x <- as.numeric(AirPassengers)
+# Detección simple con IQR (regla 1.5*IQR)
+x <- as.numeric(nottem)
 q1 <- quantile(x, 0.25)
 q3 <- quantile(x, 0.75)
 iqr <- q3 - q1
 lower <- q1 - 1.5 * iqr
 upper <- q3 + 1.5 * iqr
 
-outlier_idx <- which(x < lower | x > upper)
-outlier_vals <- x[outlier_idx]
+out_idx <- which(x < lower | x > upper)
+out_vals <- x[out_idx]
 
 cat("\nDetección de outliers (regla IQR 1.5):\n")
 cat("Límite inferior:", lower, "\n")
 cat("Límite superior:", upper, "\n")
-cat("Nº de outliers detectados:", length(outlier_idx), "\n")
+cat("Nº de outliers detectados:", length(out_idx), "\n")
 
-# Convertir índices a fechas (año-mes) para reportar
-tp <- time(AirPassengers)
-outlier_time <- tp[outlier_idx]
-out_df <- data.frame(time = outlier_time, value = outlier_vals)
+# Fechas (año decimal) para localizar outliers en la serie
+t_not <- time(nottem)
+out_time <- t_not[out_idx]
+out_df <- data.frame(time = out_time, value = out_vals)
 print(out_df)
 
-# Destacar outliers sobre la serie
-plot(AirPassengers,
-     main = "AirPassengers con outliers destacados (IQR)",
-     xlab = "Año", ylab = "Nº de pasajeros")
-points(outlier_time, outlier_vals, pch = 19)
+# Marcar outliers en la serie temporal
+plot(nottem,
+     main = "nottem con outliers destacados (IQR)",
+     xlab = "Año", ylab = "Temperatura",
+     col = "blue")
+points(out_time, out_vals, pch = 19, col = "red")
 
-# 6) Interpretación (prints cortos) ----
+# 6) Interpretación breve (prints) ----
 cat("\n================ INTERPRETACIÓN =================\n")
-cat("1) Tendencia/estacionalidad: la serie muestra tendencia creciente y estacionalidad anual.\n")
-cat("2) Estacionariedad: el ADF en la serie original suele NO rechazar estacionariedad; tras diferenciar, normalmente mejora.\n")
-cat("3) Outliers: los puntos marcados suelen corresponder a picos asociados a meses de alta demanda (estacionalidad) o variaciones anómalas.\n")
+cat("1) La descomposición muestra estacionalidad anual clara en temperaturas.\n")
+cat("2) ACF/PACF ayudan a ver autocorrelación y patrón estacional.\n")
+cat("3) ADF evalúa estacionariedad; si no lo es, la diferenciación puede mejorarla.\n")
+cat("4) Outliers (IQR) se señalan en rojo; revisar si coinciden con inviernos/veranos extremos.\n")
 cat("=================================================\n")
