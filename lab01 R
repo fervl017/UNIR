@@ -1,0 +1,58 @@
+Criterios de calificación
+Carga y preparación de datos
+El dataset está correctamente cargado y explorado. Incluye una gráfica inicial que muestra la serie temporal.
+Peso: 20
+Análisis exploratorio y visualización
+La descomposición de la serie identifica correctamente los componentes de tendencia, estacionalidad y aleatoriedad. Los gráficos son claros y destacan patrones importantes.
+Peso: 30
+Análisis de estacionariedad
+Los gráficos ACF/PACF y la prueba de Dickey-Fuller están correctamente realizados. Si es necesario, la serie es transformada para hacerla estacionaria.
+Peso: 30
+Detección de valores atípicos
+Se identifican y visualizan valores atípicos en la serie temporal.
+Peso: 20
+Descripción
+En este ejercicio, analizarás la serie temporal de temperaturas mensuales en Nottingham (nottem) entre 1920 y 1939. Identificarás patrones de tendencia, estacionalidad y valores atípicos, evaluando la estacionariedad de la serie y explorando sus componentes clave.
+
+
+Este ejercicio será evaluado utilizando inteligencia artificial. Desarrolla el proyecto en tu ordenador y, una vez finalizado, selecciona la opción “Cargar repositorio GitHub” para subir únicamente el archivo .R o .Rmd en el que desarrollaste el proyecto.
+
+Requisitos
+Usar el dataset nottem incluido en R.
+Analizar la serie temporal para detectar patrones de tendencia, estacionalidad y valores atípicos.
+Evaluar la estacionariedad de la serie temporal.
+Documentar todo el proceso en un archivo .R o .Rmd y subirlo a un repositorio público en GitHub.
+Instrucciones
+Este proyecto debe ser desarrollado localmente en tu ordenador utilizando RStudio. Una vez hayas completado el código, selecciona la opción “Cargar repositorio GitHub” para subir únicamente el archivo .R o .Rmd en el que desarrollaste el proyecto.
+
+1.   Carga del dataset:
+
+Usa el dataset nottem incluido en R.
+Inspecciona la estructura del dataset y grafica la serie temporal:
+# Cargar el dataset
+data("nottem")
+
+# Inspeccionar la estructura
+print(class(nottem))
+print(summary(nottem))
+
+# Graficar la serie temporal
+plot(nottem, main = "Temperaturas Mensuales en Nottingham (1920-1939)",
+     xlab = "Año", ylab = "Temperatura", col = "blue")
+2.   Exploración y preparación de datos:
+
+Descompón la serie temporal para identificar componentes de tendencia, estacionalidad y aleatoriedad.
+3.   Análisis de estacionariedad:
+
+Usa gráficos ACF/PACF para identificar patrones de autocorrelación.
+Realiza la prueba de Dickey-Fuller para evaluar la estacionariedad de la serie.
+4.   Transformación de la serie (si es necesario):
+
+Si la serie no es estacionaria, aplica una diferenciación para convertirla.
+Verifica nuevamente la estacionariedad.
+5.   Detección de valores atípicos:
+
+Identifica posibles valores atípicos en la serie temporal usando gráficos de caja y visualizaciones.
+6.  Entrega:
+
+Documenta todo en un archivo .R o .Rmd y sube el proyecto a un repositorio público en GitHub.
